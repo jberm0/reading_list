@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "reading-list"
+version = "0.1.0"
+description = "A project to create and manage a reading list"
+authors = ["jberm0 <jmberman12@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+flask = "^3.1.0"
+ipython = "^8.29.0"
+duckdb = "^1.1.3"
+polars = "^1.13.1"
+pyarrow = "^18.0.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
