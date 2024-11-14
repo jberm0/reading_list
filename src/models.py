@@ -1,5 +1,5 @@
 import duckdb
-from i_o import write_input_to_local_json, read_local_json
+from src.i_o import write_input_to_local_json, read_local_json
 import os
 
 

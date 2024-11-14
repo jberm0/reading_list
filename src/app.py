@@ -1,4 +1,4 @@
-from db import create_books_table, get_duckdb
+from src.db import create_books_table, get_duckdb
 import duckdb
 
 get_duckdb()
