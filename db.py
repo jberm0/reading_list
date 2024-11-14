@@ -1,15 +1,15 @@
 import duckdb
+import os
+import polars as pl
 
-def get_duckdb():
+def get_duckdb() -> duckdb.duckdb.DuckDBPyConnection:
     return duckdb.connect('./database.db')
-
-def query_db(query: str):
-    duckdb.sql(query).show()
 
 def create_books_table():
     duckdb.execute(
-        """CREATE OR REPLACE TABLE books (
-            id int primary key NOT NULL,
+        """
+        CREATE OR REPLACE TABLE books (
+            id integer primary key NOT NULL,
             title VARCHAR(100) NOT NULL,
             author VARCHAR(50),
             year INT,
@@ -17,7 +17,10 @@ def create_books_table():
             )
         """
     )
-
-# get_duckdb()
-create_books_table()
-query_db("SELECT * FROM books")
+    books_df = pl.concat([pl.read_json(f'./data/books/{p}') for p in os.listdir('./data/books')])
+    duckdb.execute(
+        """
+        INSERT INTO books
+        SELECT * FROM books_df
+        """
+    )
