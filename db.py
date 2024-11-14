@@ -2,8 +2,10 @@ import duckdb
 import os
 import polars as pl
 
+
 def get_duckdb() -> duckdb.duckdb.DuckDBPyConnection:
-    return duckdb.connect('./database.db')
+    return duckdb.connect("./database.db")
+
 
 def create_books_table():
     duckdb.execute(
@@ -17,7 +19,9 @@ def create_books_table():
             )
         """
     )
-    books_df = pl.concat([pl.read_json(f'./data/books/{p}') for p in os.listdir('./data/books')])
+    books_df = pl.concat(  # noqa
+        [pl.read_json(f"./data/books/{p}") for p in os.listdir("./data/books")]
+    )
     duckdb.execute(
         """
         INSERT INTO books

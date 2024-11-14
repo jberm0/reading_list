@@ -1,7 +1,5 @@
-from i_o import read_local_json
 # from models import Book
 import os
-import duckdb
 import polars as pl
 
 # print(read_local_json('books', 1))
@@ -11,6 +9,8 @@ import polars as pl
 
 # # Book(title='The Mushroom at the End of the World', author='Anna Lowenhaupt Tsing', year=2015, category='Nature')
 
-print(os.listdir('./data/books'))
+print(os.listdir("./data/books"))
 
-print(pl.concat([pl.read_json(f'./data/books/{p}') for p in os.listdir('./data/books')]))
+print(
+    pl.concat([pl.read_json(f"./data/books/{p}") for p in os.listdir("./data/books")])
+)

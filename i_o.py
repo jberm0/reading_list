@@ -1,12 +1,13 @@
 import polars as pl
-import datetime as dt
 import os
 
+
 def write_input_to_local_json(df: pl.DataFrame, table: str, id: int):
-    path = f'./data/{table}'
+    path = f"./data/{table}"
     if not os.path.exists(path):
         os.makedirs(path)
-    return df.write_json(path + f'/{id}.json')
+    return df.write_json(path + f"/{id}.json")
+
 
 def read_local_json(table: str, id: int) -> pl.DataFrame:
-    return pl.read_json(f'./data/{table}/{id}.json')
+    return pl.read_json(f"./data/{table}/{id}.json")

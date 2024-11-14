@@ -1,4 +1,3 @@
-from models import Book
 from db import create_books_table, get_duckdb
 import duckdb
 
