@@ -16,12 +16,17 @@ def query_db(query) -> Optional[pl.DataFrame]:
         except AttributeError:
             return None
 
-    # books_df = pl.concat(  # noqa
-    #     [pl.read_json(f"./data/books/{p}") for p in os.listdir("./data/books")]
-    # )
-    # duckdb.execute(
-    #     """
-    #     INSERT INTO books
-    #     SELECT * FROM books_df
-    #     """
-    # )
+def create_or_replace_table(schema, table, extension):
+        duckdb.execute(f"CREATE SCHEMA IF NOT EXISTS {schema};")
+        duckdb.execute(
+            f"""
+            CREATE OR REPLACE TABLE {schema}.{table} 
+            AS SELECT * FROM read_csv('./{schema}/{table}.{extension}')
+            """
+        )
+        print(f"Updated table {schema}.{table} from path './{schema}/{table}.{extension}'")
+
+def sync_table_to_local_file(schema, table, extension):
+        table_name = f"{schema}.{table}"
+        duckdb.execute(f"COPY {table_name} TO './{schema}/{table}.{extension}'")
+        print(f"Copied {table_name} to './{schema}/{table}.{extension}'")

@@ -2,19 +2,14 @@ import duckdb
 import datetime as dt
 import polars as pl
 from typing import List
-
-
-class Args:
-    def __repr__(self):
-        return str(vars(self))
-
+from db import create_or_replace_table, sync_table_to_local_file
 
 class Table:
     def __init__(self, schema, table):
         self.schema = schema
         self.table = table
 
-        self.create_or_replace_table()
+        create_or_replace_table(schema=self.schema, table=self.table, extension=self.extension)
 
     @property
     def extension(self) -> str:
@@ -32,19 +27,6 @@ class Table:
     def duckdb_query(self):
         query = f"SELECT * FROM {self.duckdb_table}"
         return query
-
-    def create_or_replace_table(self):
-        duckdb.execute(f"CREATE SCHEMA IF NOT EXISTS {self.schema};")
-        duckdb.execute(
-            f"""
-            CREATE OR REPLACE TABLE {self.duckdb_table} 
-            AS SELECT * FROM read_csv('./{self.schema}/{self.table}.csv')
-            """
-        )
-        print("updated table from path")
-
-    def sync_table_to_local_file(self):
-        duckdb.execute(f"COPY data.books TO '{self.local_path}'")
 
 
 class Book:
@@ -73,10 +55,10 @@ class Book:
         return books_count + 1
 
     def insert_to_local_table(self):
-        df = self.df
-        print(df)
+        df = self.df # noqa
         duckdb.execute("""INSERT INTO data.books SELECT * FROM df""")
-        self.table.sync_table_to_local_file()
+        print(duckdb.sql("SELECT * FROM data.books"))
+        sync_table_to_local_file(schema='data', table='books', extension='csv')
 
     def validate_new_book(self):
         query = f"""
@@ -98,9 +80,6 @@ class Book:
     def delete_book():
         pass
 
-    def add_to_reading_list():
-        pass
-
     def remove_from_reading_list():
         pass
 
@@ -112,8 +91,18 @@ class BooksFinished(List[Book]):
     pass
 
 
-class ReadingList(List[Book]):
-    pass
+class ReadingList:
+    
+    def __init__(self) -> None:
+        self.table = Table('data', 'reading_list')
+
+        create_or_replace_table(schema=self.schema, table=self.table, extension=self.extension)
+
+    def add_book(self, Book):
+        pass
+
+    def finish_book(self, Book):
+        pass
 
     def display_list(self):
         pass

@@ -1,6 +1,9 @@
 import polars as pl
 from typing import Dict, List
-from classes import Args
+
+class Args:
+    def __repr__(self):
+        return str(vars(self))
 
 def get_arguments_input(argument_names: List[str]):
     args = Args()
