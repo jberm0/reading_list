@@ -2,7 +2,7 @@ import duckdb
 import datetime as dt
 import polars as pl
 from typing import List
-from pydantic import BaseModel
+
 
 class Table:
     def __init__(self, schema, table):
