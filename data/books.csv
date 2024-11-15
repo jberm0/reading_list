@@ -1,3 +1,2 @@
-ID, Title, Author, Year, Category
-1, Great Spanish Stories, Penguin, 2024, Language
-2, The Mushroom at the End of the World, Anna Lowenhaupt Tsing, 2015, Nature
+id,title,author,category,added
+1,Great Spanish Stories,Penguin,Language,2024-11-15 00:01:11.6854752,The Mushroom at the End of the World,Anna Lowenhaupt Tsing,Nature,2024-11-15T10:01:53.396386

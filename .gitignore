@@ -1,5 +1,6 @@
 .venv/
 .__pycache__/
-.data
+.data/*
 .database.db
 .ruff_cache
+.src/__pycache__/

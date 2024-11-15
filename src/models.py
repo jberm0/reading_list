@@ -1,32 +1,95 @@
 import duckdb
-from src.i_o import write_input_to_local_json, read_local_json
-import os
+import datetime as dt
+import polars as pl
+
+
+class Table:
+    def __init__(self, schema, table):
+        self.schema = schema
+        self.table = table
+
+        self.create_or_replace_table()
+
+    @property
+    def extension(self) -> str:
+        return "csv"
+
+    @property
+    def local_path(self):
+        return f"./{self.schema}/{self.table}.{self.extension}"
+
+    @property
+    def duckdb_table(self):
+        return f"{self.schema}.{self.table}"
+
+    @property
+    def duckdb_query(self):
+        query = f"SELECT * FROM {self.duckdb_table}"
+        return query
+
+    def create_or_replace_table(self):
+        duckdb.execute(f"CREATE SCHEMA IF NOT EXISTS {self.schema};")
+        duckdb.execute(
+            f"""
+            CREATE OR REPLACE TABLE {self.duckdb_table} 
+            AS SELECT * FROM read_csv('./{self.schema}/{self.table}.csv')
+            """
+        )
+        print("updated table from path")
 
 
 class Book:
-    def __init__(self, title, author, year, category):
+    def __init__(self, title, author, category):
+        self.table = Table("data", "books")
         self.id = self.create_book_id()
         self.title = title
         self.author = author
-        self.year = year
         self.category = category
+        self.added = dt.datetime.today()
+        self.df = pl.DataFrame(
+            {
+                key: self.__dict__.get(key)
+                for key in ["id", "title", "author", "category", "added"]
+            }
+        )
 
-        df = duckdb.sql(
-            f"SELECT {self.id} as id, '{self.title}' as title, '{self.author}' as author, '{self.year}' as year, '{self.category}' as category"
-        ).pl()
+        self.validate_new_book()
 
-        write_input_to_local_json(df, "books", self.id)
-
-        self.insert_to_db()
+        self.insert_to_local_table()
 
     def create_book_id(self):
-        return len(os.listdir("./data/books")) + 1
+        books_count = duckdb.sql(
+            f"SELECT COUNT() FROM read_csv('{self.table.local_path}')"
+        ).pl()[0, 0]
+        return books_count + 1
 
-    def insert_to_db(self):
-        df = read_local_json("books", self.id)  # noqa
-        duckdb.execute("INSERT INTO books SELECT * FROM df")
+    def insert_to_local_table(self):
+        with open(self.table.local_path, "a") as f:
+            self.df.write_csv(f, include_header=False)
 
-    def add_to_list():
+    def validate_new_book(self):
+        query = f"""
+            SELECT COUNT(*) AS count, id, title, author FROM read_csv('{self.table.local_path}')
+            WHERE id = '{self.id}' OR LEVENSHTEIN(title, '{self.title}') < 5
+            GROUP BY id, title, author
+            ORDER BY id
+        """
+        matches_query = duckdb.sql(query).pl()
+        duplicate_message = f"""
+                The book you are trying to enter may already exist in the table, please check the table of matches:
+                {matches_query}
+                """
+        if not matches_query.is_empty():
+            assert matches_query[0, 0] == 0, duplicate_message
+        else:
+            return True
+
+    # def insert_to_db(self):
+    #     df = self.df
+    #     duckdb.execute("INSERT INTO books SELECT * FROM df")
+    #     duckdb.execute("COPY books TO './data/books.csv' (HEADER, DELIMITER ',')")
+
+    def add_to_reading_list():
         pass
 
     def finish():
