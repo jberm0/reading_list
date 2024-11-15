@@ -1,10 +1,8 @@
-# from db import create_books_table, get_duckdb
-from classes import Book, Table, ReadingList
+from classes import Book, Table
 from utils import get_arguments_input
 import duckdb
-
-# get_duckdb()
-# create_books_table()
+from db import insert_to_local_table
+from db import validate_new_entry
 
 
 def create_book():
@@ -18,17 +16,19 @@ def create_book():
         category=args.__getattribute__("category"),
     )
 
-    new_book.validate_new_book()
+    validate_new_entry(
+        path="./data/books.csv", book_id=new_book.book_id, title=new_book.title
+    )
 
-    new_book.insert_to_local_table()
+    insert_to_local_table(new_book, "books")
 
     print(new_book)
 
 
 def view_table(table: Table):
     print(duckdb.execute(table.duckdb_query).pl())
-    
 
 
 if __name__ == "__main__":
-    view_table(Table('data', 'reading_list', ReadingList.reading_list_schema))
+    create_book()
+    # view_table(Table('data', 'reading_list', ReadingList.reading_list_schema))
