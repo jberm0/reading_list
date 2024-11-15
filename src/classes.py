@@ -2,8 +2,8 @@ import duckdb
 import datetime as dt
 import polars as pl
 from typing import List
-from db import create_or_replace_table, sync_table_to_local_file
-from utils import create_id
+from src.db import create_or_replace_table, sync_table_to_local_file
+from src.utils import create_id
 
 class Table:
     def __init__(self, schema, table, pl_schema):
@@ -76,8 +76,14 @@ class Book:
         else:
             return True
 
-    def delete_book():
-        pass
+    def delete_book(self):
+        query = f"""
+                DELETE FROM data.books WHERE id = '{self.id}'
+                """
+        duckdb.execute(query)
+        print(f"Deleted from data.books where id is {self.id}")
+        sync_table_to_local_file(schema='data', table='books', extension='csv')
+        print(f"Synced to local filesystem")
 
     def remove_from_reading_list():
         pass
