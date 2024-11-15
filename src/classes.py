@@ -1,9 +1,7 @@
-import duckdb
 import datetime as dt
 import polars as pl
 from db import (
     create_or_replace_table,
-    sync_table_to_local_file,
     validate_new_entry,
     insert_to_local_table,
 )
@@ -109,6 +107,7 @@ class ToRead(Book):
         }
         attrs_dict["book_id"] = self.book_id
         return pl.DataFrame(attrs_dict)
+
 
 class FinishedList:
     finished_list_schema = pl.Schema(

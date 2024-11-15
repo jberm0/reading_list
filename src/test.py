@@ -1,8 +1,5 @@
-from classes import Book, Table, ReadingList
-from db import validate_new_entry, insert_to_local_table
+from classes import ReadingList
 import duckdb
-import polars as pl
-import datetime as dt
 
 # print(read_local_json('books', 1))
 
@@ -33,10 +30,12 @@ import datetime as dt
 
 x = ReadingList()
 
-print(duckdb.execute(
-        f"""
+print(
+    duckdb.execute(
+        """
         SELECT * FROM data.reading_list
         """
-    ).pl())
+    ).pl()
+)
 
 # print(type(pl.read_csv('./data/books.csv').schema))

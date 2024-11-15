@@ -95,6 +95,7 @@ def display_fp_table(schema, table, extension):
         ).pl()
     )
 
+
 def delete_book(book, table):
     query = f"""
             DELETE FROM data.'{table}' WHERE book_id = '{book.book_id}'
