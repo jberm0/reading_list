@@ -83,6 +83,12 @@ class Book:
         )
         insert_to_local_table(book_to_read, "reading_list")
 
+    def remove_from_reading_list():
+        pass
+
+    def finish():
+        pass
+
 
 class ToRead(Book):
     def __init__(self, title, author, category, suggested_by):
@@ -104,15 +110,20 @@ class ToRead(Book):
         attrs_dict["book_id"] = self.book_id
         return pl.DataFrame(attrs_dict)
 
-    def remove_from_reading_list():
-        pass
+class FinishedList:
+    finished_list_schema = pl.Schema(
+        {
+            "book_id": pl.Int64,
+            "finished_id": pl.Int64,
+            "title": pl.String,
+            "author": pl.String,
+            "rating": pl.String,
+            "finished": pl.Datetime(time_unit="us", time_zone=None),
+        }
+    )
 
-    def finish():
-        pass
-
-
-class Finish(ToRead):
-    pass
+    def __init__(self) -> None:
+        self.table = Table("data", "finished_list", FinishedList.finished_list_schema)
 
 
 class ReadingList:
