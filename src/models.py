@@ -37,6 +37,9 @@ class Table:
         )
         print("updated table from path")
 
+    def sync_table_to_local_file(self):
+        duckdb.execute(f"COPY data.books TO '{self.local_path}'")
+
 
 class Book:
     def __init__(self, title, author, category):
@@ -64,8 +67,10 @@ class Book:
         return books_count + 1
 
     def insert_to_local_table(self):
-        with open(self.table.local_path, "a") as f:
-            self.df.write_csv(f, include_header=False)
+        df = self.df
+        print(df)
+        duckdb.execute(f"""INSERT INTO data.books SELECT * FROM df""")
+        self.table.sync_table_to_local_file()
 
     def validate_new_book(self):
         query = f"""
@@ -83,11 +88,6 @@ class Book:
             assert matches_query[0, 0] == 0, duplicate_message
         else:
             return True
-
-    # def insert_to_db(self):
-    #     df = self.df
-    #     duckdb.execute("INSERT INTO books SELECT * FROM df")
-    #     duckdb.execute("COPY books TO './data/books.csv' (HEADER, DELIMITER ',')")
 
     def add_to_reading_list():
         pass

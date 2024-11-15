@@ -1,6 +1,7 @@
-# from models import Book
+from src.models import Table
 import os
 import polars as pl
+import duckdb
 
 # print(read_local_json('books', 1))
 
@@ -9,8 +10,7 @@ import polars as pl
 
 # # Book(title='The Mushroom at the End of the World', author='Anna Lowenhaupt Tsing', year=2015, category='Nature')
 
-print(os.listdir("./data/books"))
+books = Table('data', 'books')
+print(books.duckdb_query)
 
-print(
-    pl.concat([pl.read_json(f"./data/books/{p}") for p in os.listdir("./data/books")])
-)
+print(duckdb.sql(books.duckdb_query).pl())

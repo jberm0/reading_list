@@ -1,5 +1,6 @@
 # from db import create_books_table, get_duckdb
 from models import Book
+import duckdb
 
 # get_duckdb()
 # create_books_table()
@@ -17,7 +18,7 @@ x = Book(
 
 # x.insert_to_db()
 
-# query_db("SELECT * FROM books")
+print(duckdb.sql("SELECT * FROM data.books").pl())
 
 # print(x)
 
