@@ -18,6 +18,10 @@ def create_book():
         category=args.__getattribute__("category"),
     )
 
+    new_book.validate_new_book()
+
+    new_book.insert_to_local_table()
+
     print(new_book)
 
 

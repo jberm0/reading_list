@@ -50,3 +50,17 @@ def sync_table_to_local_file(schema, table, extension):
         table_name = f"{schema}.{table}"
         duckdb.execute(f"COPY {table_name} TO './{schema}/{table}.{extension}'")
         print(f"Copied {table_name} to './{schema}/{table}.{extension}'")
+
+def display_db_table(schema, table):
+    print(duckdb.execute(
+        f"""
+        SELECT * FROM '{schema}'.'{table}'
+        """
+    ).pl())
+
+def display_fp_table(schema, table, extension):
+    print(duckdb.execute(
+        f"""
+        SELECT * FROM read_'{extension}'('./{schema}/{table}/{extension}')
+        """
+    ).pl())

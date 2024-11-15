@@ -3,7 +3,7 @@ import datetime as dt
 import polars as pl
 from typing import List
 from src.db import create_or_replace_table, sync_table_to_local_file
-from src.utils import create_id
+from src.utils import create_id, get_arguments_input
 
 class Table:
     def __init__(self, schema, table, pl_schema):
@@ -32,39 +32,52 @@ class Table:
 
 
 class Book:
-    book_schema = pl. Schema({'id': pl.Int64, 'title': pl.String, 'author': pl.String, 'category': pl.String, 'added': pl.Datetime(time_unit='us', time_zone=None)})
+    book_schema = pl. Schema({'book_id': pl.Int64, 'title': pl.String, 'author': pl.String, 'category': pl.String, 'added': pl.Datetime(time_unit='us', time_zone=None)})
 
     def __init__(self, title, author, category):
         
         self.table = Table("data", "books", Book.book_schema)
-        self.id = create_id("./data/books.csv")
+        # self.book_id = create_id("./data/books.csv")
         self.title = title
         self.author = author
         self.category = category
         self.added = dt.datetime.today()
-        self.df = pl.DataFrame(
-            {
+        # self.df = pl.DataFrame(
+        #     {
+        #         key: self.__dict__.get(key)
+        #         for key in ["book_id", "title", "author", "category", "added"]
+        #     }
+        # )
+
+        # self.validate_new_book()
+
+        # self.insert_to_local_table()
+
+    @property
+    def book_id(self):
+        return create_id("./data/books.csv")
+
+    @property
+    def book_df(self):
+        attrs_dict = {
                 key: self.__dict__.get(key)
-                for key in ["id", "title", "author", "category", "added"]
+                for key in ["book_id", "title", "author", "category", "added"]
             }
-        )
-
-        self.validate_new_book()
-
-        self.insert_to_local_table()
+        attrs_dict['book_id'] = self.book_id
+        return pl.DataFrame(attrs_dict)
 
     def insert_to_local_table(self):
-        df = self.df # noqa
+        df = self.book_df # noqa
         duckdb.execute("""INSERT INTO data.books SELECT * FROM df""")
         print(duckdb.sql("SELECT * FROM data.books"))
         sync_table_to_local_file(schema='data', table='books', extension='csv')
 
     def validate_new_book(self):
         query = f"""
-            SELECT COUNT(*) AS count, id, title, author FROM read_csv('{self.table.local_path}')
-            WHERE id = '{self.id}' OR LEVENSHTEIN(title, '{self.title}') < 5
-            GROUP BY id, title, author
-            ORDER BY id
+            SELECT COUNT(*) AS count, book_id, title, author FROM read_csv('{self.table.local_path}')
+            WHERE book_id = '{self.book_id}' OR LEVENSHTEIN(title, '{self.title}') < 5
+            GROUP BY book_id, title, author
+            ORDER BY book_id
         """
         matches_query = duckdb.sql(query).pl()
         duplicate_message = f"""
@@ -76,14 +89,45 @@ class Book:
         else:
             return True
 
-    def delete_book(self):
+    def delete_book(self, table):
         query = f"""
-                DELETE FROM data.books WHERE id = '{self.id}'
+                DELETE FROM data.'{table}' WHERE book_id = '{self.book_id}'
                 """
         duckdb.execute(query)
-        print(f"Deleted from data.books where id is {self.id}")
-        sync_table_to_local_file(schema='data', table='books', extension='csv')
+        print(f"Deleted from data.'{table}' where book_id is {self.book_id}")
+        sync_table_to_local_file(schema='data', table=table, extension='csv')
         print(f"Synced to local filesystem")
+
+    def add_to_reading_list(self):
+        suggested_by = get_arguments_input(['suggested_by']).__getattribute__('suggested_by')
+        ToRead(self.title, self.author, self.category, suggested_by)
+
+
+class ToRead(Book):
+
+    def __init__(self, title, author, category, suggested_by):
+        super().__init__(title, category, author)
+        self.suggested_by = suggested_by
+        self.added = dt.datetime.today()
+        self.list_id = create_id('./data/reading_list.csv')
+
+        print(self.book_id)
+
+        print(self.list_df)
+
+    @property
+    def book_id(self):
+        return super().book_id
+
+    @property
+    def list_df(self):
+        attrs_dict = {
+                key: self.__dict__.get(key)
+                for key in ["list_id", "title", "author", "suggested_by", "added"]
+            }
+        attrs_dict['book_id'] = self.book_id
+        return pl.DataFrame(attrs_dict)
+
 
     def remove_from_reading_list():
         pass
@@ -97,20 +141,7 @@ class BooksFinished(List[Book]):
 
 
 class ReadingList:
-    reading_list_schema = pl. Schema({'id': pl.Int64, 'title': pl.String, 'author': pl.String, 'suggested_by': pl.String, 'added': pl.Datetime(time_unit='us', time_zone=None)})
+    reading_list_schema = pl. Schema({'book_id': pl.Int64, 'list_id': pl.Int64, 'title': pl.String, 'author': pl.String, 'suggested_by': pl.String, 'added': pl.Datetime(time_unit='us', time_zone=None)})
     
     def __init__(self) -> None:
         self.table = Table('data', 'reading_list', ReadingList.reading_list_schema)
-
-    def add_book(self, Book):
-        pass
-
-    def finish_book(self, Book):
-        pass
-
-    def display_list(self):
-        print(duckdb.execute(
-            f"""
-            SELECT * FROM data.reading_list
-            """
-        ).pl())
