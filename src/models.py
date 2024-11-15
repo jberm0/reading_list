@@ -69,7 +69,7 @@ class Book:
     def insert_to_local_table(self):
         df = self.df
         print(df)
-        duckdb.execute(f"""INSERT INTO data.books SELECT * FROM df""")
+        duckdb.execute("""INSERT INTO data.books SELECT * FROM df""")
         self.table.sync_table_to_local_file()
 
     def validate_new_book(self):
