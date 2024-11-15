@@ -1,7 +1,8 @@
 import duckdb
 import datetime as dt
 import polars as pl
-
+from typing import List
+from pydantic import BaseModel
 
 class Table:
     def __init__(self, schema, table):
@@ -89,22 +90,25 @@ class Book:
         else:
             return True
 
+    def delete_book():
+        pass
+
     def add_to_reading_list():
+        pass
+
+    def remove_from_reading_list():
         pass
 
     def finish():
         pass
 
 
-class BooksFinished:
+class BooksFinished(List[Book]):
     pass
 
 
-class ReadingList:
+class ReadingList(List[Book]):
     pass
 
-    def remove_book():
-        pass
-
-    def display_list():
+    def display_list(self):
         pass

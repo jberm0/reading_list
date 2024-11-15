@@ -1,4 +1,4 @@
-from src.models import Table
+from src.classes import Table
 import duckdb
 
 # print(read_local_json('books', 1))
