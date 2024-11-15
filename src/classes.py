@@ -3,13 +3,15 @@ import datetime as dt
 import polars as pl
 from typing import List
 from db import create_or_replace_table, sync_table_to_local_file
+from utils import create_id
 
 class Table:
-    def __init__(self, schema, table):
+    def __init__(self, schema, table, pl_schema):
         self.schema = schema
         self.table = table
+        self.pl_schema = pl_schema
 
-        create_or_replace_table(schema=self.schema, table=self.table, extension=self.extension)
+        create_or_replace_table(schema=self.schema, table=self.table, extension=self.extension, pl_schema=pl_schema)
 
     @property
     def extension(self) -> str:
@@ -30,9 +32,12 @@ class Table:
 
 
 class Book:
+    book_schema = pl. Schema({'id': pl.Int64, 'title': pl.String, 'author': pl.String, 'category': pl.String, 'added': pl.Datetime(time_unit='us', time_zone=None)})
+
     def __init__(self, title, author, category):
-        self.table = Table("data", "books")
-        self.id = self.create_book_id()
+        
+        self.table = Table("data", "books", Book.book_schema)
+        self.id = create_id("./data/books.csv")
         self.title = title
         self.author = author
         self.category = category
@@ -47,12 +52,6 @@ class Book:
         self.validate_new_book()
 
         self.insert_to_local_table()
-
-    def create_book_id(self):
-        books_count = duckdb.sql(
-            f"SELECT COUNT() FROM read_csv('{self.table.local_path}')"
-        ).pl()[0, 0]
-        return books_count + 1
 
     def insert_to_local_table(self):
         df = self.df # noqa
@@ -92,11 +91,10 @@ class BooksFinished(List[Book]):
 
 
 class ReadingList:
+    reading_list_schema = pl. Schema({'id': pl.Int64, 'title': pl.String, 'author': pl.String, 'suggested_by': pl.String, 'added': pl.Datetime(time_unit='us', time_zone=None)})
     
     def __init__(self) -> None:
-        self.table = Table('data', 'reading_list')
-
-        create_or_replace_table(schema=self.schema, table=self.table, extension=self.extension)
+        self.table = Table('data', 'reading_list', ReadingList.reading_list_schema)
 
     def add_book(self, Book):
         pass
@@ -105,4 +103,8 @@ class ReadingList:
         pass
 
     def display_list(self):
-        pass
+        print(duckdb.execute(
+            f"""
+            SELECT * FROM data.reading_list
+            """
+        ).pl())

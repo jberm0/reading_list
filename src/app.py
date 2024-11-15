@@ -1,12 +1,13 @@
 # from db import create_books_table, get_duckdb
-from classes import Book
+from classes import Book, Table, ReadingList
 from utils import get_arguments_input
+import duckdb
 
 # get_duckdb()
 # create_books_table()
 
 
-def main():
+def create_book():
     args = get_arguments_input(["title", "author", "category"])
 
     print(args)
@@ -20,5 +21,10 @@ def main():
     print(new_book)
 
 
+def view_table(table: Table):
+    print(duckdb.execute(table.duckdb_query).pl())
+    
+
+
 if __name__ == "__main__":
-    main()
+    view_table(Table('data', 'reading_list', ReadingList.reading_list_schema))
