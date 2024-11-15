@@ -72,15 +72,6 @@ class Book:
         attrs_dict["book_id"] = self.book_id
         return pl.DataFrame(attrs_dict)
 
-    def delete_book(self, table):
-        query = f"""
-                DELETE FROM data.'{table}' WHERE book_id = '{self.book_id}'
-                """
-        duckdb.execute(query)
-        print(f"Deleted from data.'{table}' where book_id is {self.book_id}")
-        sync_table_to_local_file(schema="data", table=table, extension="csv")
-        print("Synced to local filesystem")
-
     def add_to_reading_list(self):
         suggested_by = get_arguments_input(["suggested_by"]).__getattribute__(
             "suggested_by"
@@ -99,10 +90,6 @@ class ToRead(Book):
         self.suggested_by = suggested_by
         self.added = dt.datetime.today()
         self.list_id = create_id("./data/reading_list.csv")
-
-        print(self.book_id)
-
-        print(self.list_df)
 
     @property
     def book_id(self):

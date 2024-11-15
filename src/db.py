@@ -94,3 +94,12 @@ def display_fp_table(schema, table, extension):
         """
         ).pl()
     )
+
+def delete_book(book, table):
+    query = f"""
+            DELETE FROM data.'{table}' WHERE book_id = '{book.book_id}'
+            """
+    duckdb.execute(query)
+    print(f"Deleted from data.'{table}' where book_id is {book.book_id}")
+    sync_table_to_local_file(schema="data", table=table, extension="csv")
+    print("Synced to local filesystem")
