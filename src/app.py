@@ -1,29 +1,24 @@
 # from db import create_books_table, get_duckdb
-from models import Book
-import duckdb
+from classes import Book
+from utils import get_arguments_input
 
 # get_duckdb()
 # create_books_table()
 
-x = Book(
-    title="The Mushroom at the End of the World",
-    author="Anna Lowenhaupt Tsing",
-    category="Nature",
-)
-# y = Book(title='The Mushroom at the End of the World', author='Anna Lowenhaupt Tsing', category='Nature')
 
-# query_db(f"SELECT 1 as id, '{x.title}' as title, '{x.author}' as author, '{x.year}' as year, '{x.category}' as category")
+def main():
+    args = get_arguments_input(["title", "author", "category"])
 
-# print(duckdb.sql("SELECT * FROM books"))
+    print(args)
 
-# x.insert_to_db()
+    new_book = Book(
+        title=args.__getattribute__("title"),
+        author=args.__getattribute__("author"),
+        category=args.__getattribute__("category"),
+    )
 
-print(duckdb.sql("SELECT * FROM data.books").pl())
+    print(new_book)
 
-# print(x)
 
-# x = Table("data", "books")
-
-# x.create_or_replace_table()
-
-# print(duckdb.execute("SELECT COUNT(*)+1 FROM data.books").pl()[0,0])
+if __name__ == "__main__":
+    main()

@@ -4,6 +4,11 @@ import polars as pl
 from typing import List
 
 
+class Args:
+    def __repr__(self):
+        return str(vars(self))
+
+
 class Table:
     def __init__(self, schema, table):
         self.schema = schema
