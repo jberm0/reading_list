@@ -1,6 +1,7 @@
 import datetime as dt
 import polars as pl
 import duckdb
+import streamlit as st
 import sys
 sys.path.append("././")
 
@@ -76,9 +77,7 @@ class Book:
         return pl.DataFrame(attrs_dict)
 
     def add_to_reading_list(self):
-        suggested_by = get_arguments_input(["suggested_by"]).__getattribute__(
-            "suggested_by"
-        )
+        suggested_by = st.text_input("Who suggested this book?")
         book_to_read = ToRead(self.title, self.author, self.category, suggested_by)
         ReadingList()  # noqa
         validate_new_entry(

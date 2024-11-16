@@ -1,6 +1,7 @@
 import duckdb
 import polars as pl
 import os
+import streamlit as st
 
 
 def create_or_replace_table(schema, table, extension, pl_schema):
@@ -49,12 +50,11 @@ def validate_new_entry(path: str, book_id: int, title: str):
         ORDER BY book_id
     """
     matches_query = duckdb.sql(query).pl()
-    duplicate_message = f"""
-            The book you are trying to enter may already exist in the table, please check the table of matches:
-            {matches_query}
-            """
+    duplicate_message = "The book you are trying to enter may already exist in the table, please check the table of matches"
     if not matches_query.is_empty():
-        assert matches_query[0, 0] == 0, duplicate_message
+        st.write(duplicate_message)
+        st.dataframe(matches_query)
+        return False
     else:
         return True
 
