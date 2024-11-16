@@ -22,6 +22,7 @@ def create_or_replace_table(schema, table, extension, pl_schema):
         df = pl.DataFrame(schema=pl_schema)
         print(df)
         df.write_csv(file_path, include_header=True)
+        create_or_replace_table(schema, table, extension, pl_schema)
 
 
 def sync_table_to_local_file(schema, table, extension):
@@ -66,8 +67,12 @@ def insert_to_local_table(book, table):
     elif table == "books":
         schema, table, extension = "data", "books", "csv"
         df = book.book_df  # noqa
-    duckdb.execute(f"""INSERT INTO {schema}.{table} SELECT * FROM df""")
-    print(duckdb.sql(f"SELECT * FROM {schema}.{table}"))
+
+    elif table == "finished":
+        schema, table, extension = "data", "finished", "csv"
+        df = book.finished_df  # noqa
+    duckdb.execute(f"INSERT INTO data.{table} SELECT * FROM df")
+    print(duckdb.sql(f"SELECT * FROM data.{table}"))
     sync_table_to_local_file(schema=schema, table=table, extension=extension)
 
 
@@ -89,17 +94,13 @@ def check_path_exists(path):
 def display_fp_table(schema, table, extension):
     print(
         duckdb.execute(
-            f"""
-        SELECT * FROM read_'{extension}'('./{schema}/{table}/{extension}')
-        """
+            f"SELECT * FROM read_{extension}('./{schema}/{table}.{extension}')"
         ).pl()
     )
 
 
 def delete_book(book, table):
-    query = f"""
-            DELETE FROM data.'{table}' WHERE book_id = '{book.book_id}'
-            """
+    query = f"DELETE FROM data.{table} WHERE book_id = {book.book_id}"
     duckdb.execute(query)
     print(f"Deleted from data.'{table}' where book_id is {book.book_id}")
     sync_table_to_local_file(schema="data", table=table, extension="csv")

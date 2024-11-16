@@ -1,41 +1,16 @@
-from classes import ReadingList
-import duckdb
+# from db import *
+# from classes import *
 
-# print(read_local_json('books', 1))
+# x = Book(title="deleting a book", author="jonah", category="testing")
 
-# df = read_local_json('books', 1)
-# print(duckdb.execute(f"SELECT * FROM read_csv('./data/books.csv')").pl())
+# validate_new_entry("./data/books.csv", x.book_id, x.title)
 
-# x = Book(title='deleting a book', author='jonah', category='testing')
-
-# validate_new_entry('./data/books.csv', x.book_id, x.title)
-
-# insert_to_local_table(x, 'books')
+# insert_to_local_table(x, "books")
 
 # x.add_to_reading_list()
 
-# print(duckdb.execute(f"SELECT * FROM data.books").pl())
+# validate_new_entry("./data/reading_list.csv", x.book_id, x.title)
 
-# x.delete_book()
+# x.finish()
 
-# print(duckdb.execute(f"SELECT * FROM data.books").pl())
-
-# reading_list = Table("data", "reading_list")
-# print(books.duckdb_query)
-
-# print(duckdb.sql(books.duckdb_query).pl())
-
-# ts = pl.date(dt.datetime.today())
-# print(type(ts))
-
-x = ReadingList()
-
-print(
-    duckdb.execute(
-        """
-        SELECT * FROM data.reading_list
-        """
-    ).pl()
-)
-
-# print(type(pl.read_csv('./data/books.csv').schema))
+# validate_new_entry("./data/finished.csv", x.book_id, x.title)

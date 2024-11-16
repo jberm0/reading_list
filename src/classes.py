@@ -1,5 +1,6 @@
 import datetime as dt
 import polars as pl
+import duckdb
 from db import (
     create_or_replace_table,
     validate_new_entry,
@@ -75,17 +76,21 @@ class Book:
             "suggested_by"
         )
         book_to_read = ToRead(self.title, self.author, self.category, suggested_by)
-        reading_list = ReadingList()  # noqa
+        ReadingList()  # noqa
         validate_new_entry(
             "./data/reading_list.csv", book_to_read.book_id, book_to_read.title
         )
         insert_to_local_table(book_to_read, "reading_list")
 
-    def remove_from_reading_list():
-        pass
-
-    def finish():
-        pass
+    def finish(self):
+        rating = get_arguments_input(["rating"]).__getattribute__("rating")
+        FinishedList()
+        print(duckdb.execute("SHOW ALL TABLES").pl())
+        finished_book = Finished(self.title, self.author, self.category, rating)
+        validate_new_entry(
+            "./data/finished.csv", finished_book.book_id, finished_book.title
+        )
+        insert_to_local_table(finished_book, "finished")
 
 
 class ToRead(Book):
@@ -109,6 +114,26 @@ class ToRead(Book):
         return pl.DataFrame(attrs_dict)
 
 
+class Finished(Book):
+    def __init__(self, title, author, category, rating):
+        super().__init__(title, author, category)
+        self.finished = dt.datetime.today()
+        self.finished_id = create_id("./data/finished.csv")
+
+    @property
+    def book_id(self):
+        return super().book_id
+
+    @property
+    def finished_df(self):
+        attrs_dict = {
+            key: self.__dict__.get(key)
+            for key in ["finished_id", "title", "author", "rating", "finished"]
+        }
+        attrs_dict["book_id"] = self.book_id
+        return pl.DataFrame(attrs_dict)
+
+
 class FinishedList:
     finished_list_schema = pl.Schema(
         {
@@ -122,7 +147,7 @@ class FinishedList:
     )
 
     def __init__(self) -> None:
-        self.table = Table("data", "finished_list", FinishedList.finished_list_schema)
+        self.table = Table("data", "finished", FinishedList.finished_list_schema)
 
 
 class ReadingList:
