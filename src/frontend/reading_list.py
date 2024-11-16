@@ -17,3 +17,7 @@ st.dataframe(
         """
     ).pl()
 )
+
+# TODO:
+# - add functionality to finish a book on reading list
+# - remove book from reading list

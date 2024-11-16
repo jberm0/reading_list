@@ -17,3 +17,6 @@ st.dataframe(
         """
     ).pl()
 )
+
+# TODO:
+# - remove book from finished list
