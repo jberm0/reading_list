@@ -5,6 +5,7 @@ from db import (
     create_or_replace_table,
     validate_new_entry,
     insert_to_local_table,
+    delete_book
 )
 from utils import create_id, get_arguments_input
 
@@ -81,17 +82,7 @@ class Book:
             "./data/reading_list.csv", book_to_read.book_id, book_to_read.title
         )
         insert_to_local_table(book_to_read, "reading_list")
-
-    def finish(self):
-        rating = get_arguments_input(["rating"]).__getattribute__("rating")
-        FinishedList()
-        print(duckdb.execute("SHOW ALL TABLES").pl())
-        finished_book = Finished(self.title, self.author, self.category, rating)
-        validate_new_entry(
-            "./data/finished.csv", finished_book.book_id, finished_book.title
-        )
-        insert_to_local_table(finished_book, "finished")
-
+        return book_to_read
 
 class ToRead(Book):
     def __init__(self, title, author, category, suggested_by):
@@ -113,12 +104,24 @@ class ToRead(Book):
         attrs_dict["book_id"] = self.book_id
         return pl.DataFrame(attrs_dict)
 
+    def finish(self):
+        rating = get_arguments_input(["rating"]).__getattribute__("rating")
+        FinishedList()
+        print(duckdb.execute("SHOW ALL TABLES").pl())
+        finished_book = Finished(self.title, self.author, self.category, self.suggested_by, rating)
+        validate_new_entry(
+            "./data/finished.csv", finished_book.book_id, finished_book.title
+        )
+        insert_to_local_table(finished_book, "finished")
 
-class Finished(Book):
-    def __init__(self, title, author, category, rating):
-        super().__init__(title, author, category)
+class Finished(ToRead):
+    def __init__(self, title, author, category, suggested_by, rating):
+        super().__init__(title, author, category, suggested_by)
         self.finished = dt.datetime.today()
         self.finished_id = create_id("./data/finished.csv")
+        self.rating = rating
+
+        delete_book(self, 'reading_list')
 
     @property
     def book_id(self):
