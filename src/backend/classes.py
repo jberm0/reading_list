@@ -1,13 +1,16 @@
 import datetime as dt
 import polars as pl
 import duckdb
-from db import (
+import sys
+sys.path.append("././")
+
+from src.backend.db import (
     create_or_replace_table,
     validate_new_entry,
     insert_to_local_table,
     delete_book
 )
-from utils import create_id, get_arguments_input
+from src.backend.utils import create_id, get_arguments_input
 
 
 class Table:

@@ -1,6 +1,9 @@
 from classes import Book, Table
 from utils import get_arguments_input
 import duckdb
+import sys
+sys.path.append("././")
+
 from db import insert_to_local_table
 from db import validate_new_entry
 
