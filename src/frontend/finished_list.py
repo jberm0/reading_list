@@ -6,11 +6,13 @@ sys.path.append("././")
 
 from src.backend.classes import FinishedList
 
+st.write("# Finished")
+
 FinishedList()
 st.dataframe(
     duckdb.execute(
         """
-        SELECT *
+        SELECT finished_id as id, title, author, rating, finished
         FROM data.finished
         """
     ).pl()

@@ -135,7 +135,8 @@ class Finished(ToRead):
             key: self.__dict__.get(key)
             for key in ["finished_id", "title", "author", "rating", "finished"]
         }
-        attrs_dict["book_id"] = self.book_id
+        dict = {"book_id": self.book_id}
+        dict.update(attrs_dict)
         return pl.DataFrame(attrs_dict)
 
 
