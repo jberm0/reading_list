@@ -76,15 +76,15 @@ class Book:
         attrs_dict["book_id"] = self.book_id
         return pl.DataFrame(attrs_dict)
 
-    def add_to_reading_list(self):
-        suggested_by = st.text_input("Who suggested this book?")
-        book_to_read = ToRead(self.title, self.author, self.category, suggested_by)
-        ReadingList()  # noqa
-        validate_new_entry(
-            "./data/reading_list.csv", book_to_read.book_id, book_to_read.title
-        )
-        insert_to_local_table(book_to_read, "reading_list")
-        return book_to_read
+    # def add_to_reading_list(self):
+    #     suggested_by = st.text_input("Who suggested this book?")
+    #     book_to_read = ToRead(self.title, self.author, self.category, suggested_by)
+    #     ReadingList()  # noqa
+    #     validate_new_entry(
+    #         "./data/reading_list.csv", book_to_read.book_id, book_to_read.title
+    #     )
+    #     insert_to_local_table(book_to_read, "reading_list")
+    #     return book_to_read
 
 class ToRead(Book):
     def __init__(self, title, author, category, suggested_by):
@@ -103,18 +103,19 @@ class ToRead(Book):
             key: self.__dict__.get(key)
             for key in ["list_id", "title", "author", "suggested_by", "added"]
         }
-        attrs_dict["book_id"] = self.book_id
-        return pl.DataFrame(attrs_dict)
+        dict = {"book_id": self.book_id}
+        dict.update(attrs_dict)
+        return pl.DataFrame(dict)
 
-    def finish(self):
-        rating = get_arguments_input(["rating"]).__getattribute__("rating")
-        FinishedList()
-        print(duckdb.execute("SHOW ALL TABLES").pl())
-        finished_book = Finished(self.title, self.author, self.category, self.suggested_by, rating)
-        validate_new_entry(
-            "./data/finished.csv", finished_book.book_id, finished_book.title
-        )
-        insert_to_local_table(finished_book, "finished")
+    # def finish(self):
+    #     rating = get_arguments_input(["rating"]).__getattribute__("rating")
+    #     FinishedList()
+    #     print(duckdb.execute("SHOW ALL TABLES").pl())
+    #     finished_book = Finished(self.title, self.author, self.category, self.suggested_by, rating)
+    #     validate_new_entry(
+    #         "./data/finished.csv", finished_book.book_id, finished_book.title
+    #     )
+    #     insert_to_local_table(finished_book, "finished")
 
 class Finished(ToRead):
     def __init__(self, title, author, category, suggested_by, rating):

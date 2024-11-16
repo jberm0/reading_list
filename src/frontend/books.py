@@ -23,26 +23,33 @@ def create_book():
             category=category,
         )
 
-        valid_book = validate_new_entry(
-            path="././data/books.csv", book_id=new_book.book_id, title=new_book.title
-        )
-        if valid_book:
-            insert_to_local_table(new_book, "books")
-            st.write(f"{new_book.title} added to books database")
-            st.dataframe(new_book.book_df)
+        if not add_to_reading_list:
+            is_valid_book = validate_new_entry(
+                table="books", book_id=new_book.book_id, title=new_book.title
+            )
 
-        if not valid_book:
-            st.write("You can add this book to the reading list by submitting the form again, but make sure you select option to add to reading list")
+            if is_valid_book:
+                insert_to_local_table(new_book, "books")
+                st.write(f"{new_book.title} added to books database")
+                st.dataframe(new_book.book_df)
+
+            if not is_valid_book:
+                st.write("You can add this book to the reading list by submitting the form again, but make sure you select option to add to reading list")
 
         if add_to_reading_list:
-            book_to_read = ToRead(new_book.title, new_book.author, new_book.category, suggested_by)
-            ReadingList()  # noqa
-            validate_new_entry(
-                "./data/reading_list.csv", book_to_read.book_id, book_to_read.title
-            )
-            insert_to_local_table(book_to_read, "reading_list")
-            st.write(f"{book_to_read.title} added to reading list")
-            st.dataframe(book_to_read.list_df)
+            is_valid_reading_list = validate_new_entry(
+                    "reading_list", new_book.book_id, new_book.title
+                )
+
+            if is_valid_reading_list:
+                book_to_read = ToRead(new_book.title, new_book.author, new_book.category, suggested_by)
+                ReadingList()  # noqa
+                insert_to_local_table(book_to_read, "reading_list")
+                st.write(f"{book_to_read.title} added to reading list")
+                st.dataframe(book_to_read.list_df)
+
+            else:
+                st.write("This may already exist in the reading list, try again.")
         
         st.button("Clear")
 

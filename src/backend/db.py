@@ -42,15 +42,15 @@ def display_db_table(schema, table):
     )
 
 
-def validate_new_entry(path: str, book_id: int, title: str):
+def validate_new_entry(table: str, book_id: int, title: str):
     query = f"""
-        SELECT COUNT(*) AS count, book_id, title, author FROM read_csv('{path}')
-        WHERE book_id = '{book_id}' OR LEVENSHTEIN(title, '{title}') < 5
+        SELECT COUNT(*) AS count, book_id, title, author FROM read_csv('././data/{table}.csv')
+        WHERE book_id = '{book_id}' OR LEVENSHTEIN(title, '{title}') < 2
         GROUP BY book_id, title, author
         ORDER BY book_id
     """
     matches_query = duckdb.sql(query).pl()
-    duplicate_message = "The book you are trying to enter may already exist in the table, please check the table of matches"
+    duplicate_message = f"The book you are trying to enter may already exist in the {table} table, please check the table of matches"
     if not matches_query.is_empty():
         st.write(duplicate_message)
         st.dataframe(matches_query)
