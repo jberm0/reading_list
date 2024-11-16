@@ -1,5 +1,6 @@
 import streamlit as st
 import sys
+
 sys.path.append("././")
 
 from src.backend.classes import Book, ToRead, ReadingList
@@ -34,15 +35,19 @@ def create_book():
                 st.dataframe(new_book.book_df)
 
             if not is_valid_book:
-                st.write("You can add this book to the reading list by submitting the form again, but make sure you select option to add to reading list")
+                st.write(
+                    "You can add this book to the reading list by submitting the form again, but make sure you select option to add to reading list"
+                )
 
         if add_to_reading_list:
             is_valid_reading_list = validate_new_entry(
-                    "reading_list", new_book.book_id, new_book.title
-                )
+                "reading_list", new_book.book_id, new_book.title
+            )
 
             if is_valid_reading_list:
-                book_to_read = ToRead(new_book.title, new_book.author, new_book.category, suggested_by)
+                book_to_read = ToRead(
+                    new_book.title, new_book.author, new_book.category, suggested_by
+                )
                 ReadingList()  # noqa
                 insert_to_local_table(book_to_read, "reading_list")
                 st.write(f"{book_to_read.title} added to reading list")
@@ -50,7 +55,8 @@ def create_book():
 
             else:
                 st.write("This may already exist in the reading list, try again.")
-        
+
         st.button("Clear")
+
 
 create_book()

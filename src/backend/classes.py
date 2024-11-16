@@ -1,17 +1,14 @@
 import datetime as dt
 import polars as pl
-import duckdb
-import streamlit as st
 import sys
+
 sys.path.append("././")
 
 from src.backend.db import (
     create_or_replace_table,
-    validate_new_entry,
-    insert_to_local_table,
-    delete_book
+    delete_book,
 )
-from src.backend.utils import create_id, get_arguments_input
+from src.backend.utils import create_id
 
 
 class Table:
@@ -86,6 +83,7 @@ class Book:
     #     insert_to_local_table(book_to_read, "reading_list")
     #     return book_to_read
 
+
 class ToRead(Book):
     def __init__(self, title, author, category, suggested_by):
         super().__init__(title, category, author)
@@ -117,6 +115,7 @@ class ToRead(Book):
     #     )
     #     insert_to_local_table(finished_book, "finished")
 
+
 class Finished(ToRead):
     def __init__(self, title, author, category, suggested_by, rating):
         super().__init__(title, author, category, suggested_by)
@@ -124,7 +123,7 @@ class Finished(ToRead):
         self.finished_id = create_id("./data/finished.csv")
         self.rating = rating
 
-        delete_book(self, 'reading_list')
+        delete_book(self, "reading_list")
 
     @property
     def book_id(self):
