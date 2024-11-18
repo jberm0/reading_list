@@ -6,11 +6,13 @@ import polars as pl
 
 sys.path.append("././")
 
-from src.backend.classes import ReadingList
+from src.backend.classes import init_db, Finished
+from src.backend.db import delete_book, validate_new_entry, insert_to_local_table
+
+init_db()
 
 st.write("# Reading List")
 
-ReadingList()
 st.dataframe(
     duckdb.execute(
         """
@@ -20,7 +22,6 @@ st.dataframe(
     ).pl()
 )
 
-# with st.sidebar("# Finish Book"):
 st.sidebar.title("Finish Book")
 with st.sidebar.form("Finish Book"):
     title = st.text_input("Title")
@@ -46,13 +47,32 @@ if submitted:
         Adding to finished list
         """)
 
-        st.dataframe(duckdb.execute(
-            f"""
-                SELECT book_id, title, author, '{rating}' as rating, '{dt.datetime.today()}' as finished
-                FROM data.reading_list
-                WHERE title = '{title}'
-                """
-        ).pl())
+        category = duckdb.execute(
+                f"""
+                    SELECT category
+                    FROM data.books
+                    WHERE title = '{title}'
+                    AND author = '{author}'
+                    """
+            ).pl()[0, 0]
+
+        suggested_by = duckdb.execute(
+                            f"""
+                                SELECT suggested_by
+                                FROM data.reading_list
+                                WHERE title = '{title}'
+                                AND author = '{author}'
+                                """
+                        ).pl()[0, 0]
+
+        finished_book = Finished(title, author, category, suggested_by, rating)
+
+        is_valid = validate_new_entry("finished", finished_book.book_id, finished_book.title)
+
+        if is_valid:
+            insert_to_local_table(finished_book, "finished")
+            delete_book(finished_book, "reading_list")
+
     else:
         st.write("No match found in reading list for that title and author, please check inputs")
 

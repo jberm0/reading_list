@@ -44,8 +44,8 @@ def display_db_table(schema, table):
 
 def validate_new_entry(table: str, book_id: int, title: str):
     query = f"""
-        SELECT COUNT(*) AS count, book_id, title, author FROM read_csv('././data/{table}.csv')
-        WHERE book_id = '{book_id}' OR LEVENSHTEIN(title, '{title}') < 2
+        SELECT COUNT(*) AS count, book_id, title, author FROM data.{table}
+        WHERE book_id = '{book_id}' OR title = '{title}'
         GROUP BY book_id, title, author
         ORDER BY book_id
     """

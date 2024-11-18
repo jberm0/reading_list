@@ -6,7 +6,6 @@ sys.path.append("././")
 
 from src.backend.db import (
     create_or_replace_table,
-    delete_book,
 )
 from src.backend.utils import create_id
 
@@ -86,7 +85,7 @@ class Book:
 
 class ToRead(Book):
     def __init__(self, title, author, category, suggested_by):
-        super().__init__(title, category, author)
+        super().__init__(title, author, category)
         self.suggested_by = suggested_by
         self.added = dt.datetime.today()
         self.list_id = create_id("./data/reading_list.csv")
@@ -123,7 +122,7 @@ class Finished(ToRead):
         self.finished_id = create_id("./data/finished.csv")
         self.rating = rating
 
-        delete_book(self, "reading_list")
+        # delete_book(self, "reading_list")
 
     @property
     def book_id(self):
@@ -133,11 +132,11 @@ class Finished(ToRead):
     def finished_df(self):
         attrs_dict = {
             key: self.__dict__.get(key)
-            for key in ["finished_id", "title", "author", "rating", "finished"]
+            for key in ["finished_id", "title", "author", "suggested_by", "rating", "finished"]
         }
         dict = {"book_id": self.book_id}
         dict.update(attrs_dict)
-        return pl.DataFrame(attrs_dict)
+        return pl.DataFrame(dict)
 
 
 class FinishedList:
@@ -147,6 +146,7 @@ class FinishedList:
             "finished_id": pl.Int64,
             "title": pl.String,
             "author": pl.String,
+            "suggested_by": pl.String,
             "rating": pl.String,
             "finished": pl.Datetime(time_unit="us", time_zone=None),
         }
@@ -170,3 +170,23 @@ class ReadingList:
 
     def __init__(self) -> None:
         self.table = Table("data", "reading_list", ReadingList.reading_list_schema)
+
+class Books:
+    books_schema = pl.Schema(
+        {
+            "book_id": pl.Int64,
+            "title": pl.String,
+            "author": pl.String,
+            "category": pl.String,
+            "added": pl.Datetime(time_unit="us", time_zone=None),
+        }
+    )
+
+    def __init__(self) -> None:
+        self.table = Table("data", "books", Books.books_schema)
+
+
+def init_db():
+    Books()
+    ReadingList()
+    FinishedList()

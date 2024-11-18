@@ -12,7 +12,7 @@ FinishedList()
 st.dataframe(
     duckdb.execute(
         """
-        SELECT finished_id as id, title, author, rating, finished
+        SELECT finished_id as id, title, author, suggested_by, rating, finished
         FROM data.finished
         """
     ).pl()
