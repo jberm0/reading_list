@@ -6,13 +6,14 @@ sys.path.append("././")
 from src.backend.classes import Book, ToRead, ReadingList
 from src.backend.db import validate_new_entry, insert_to_local_table
 
+st.write("# Add a book to the reading list")
 
 def create_book():
     with st.form("add book"):
         title = st.text_input("Title")
         author = st.text_input("Author")
         category = st.text_input("Category")
-        add_to_reading_list = st.checkbox("Add this book to reading list?")
+        add_to_reading_list = st.toggle("Add book to reading list", help="if not activated, the book will be added to the database only")
         suggested_by = st.text_input("Who suggested this book?")
 
         submitted = st.form_submit_button("Submit")
