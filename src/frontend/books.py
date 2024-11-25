@@ -1,5 +1,6 @@
 import streamlit as st
 import sys
+import duckdb
 
 sys.path.append("././")
 
@@ -25,26 +26,26 @@ def create_book():
             category=category,
         )
 
-        if not add_to_reading_list:
-            is_valid_book = validate_new_entry(
+        is_valid_book = validate_new_entry(
                 table="books", book_id=new_book.book_id, title=new_book.title
             )
 
-            if is_valid_book:
-                insert_to_local_table(new_book, "books")
-                st.write(f"{new_book.title} added to books database")
-                st.dataframe(new_book.book_df)
+        is_valid_reading_list = validate_new_entry(
+                "reading_list", new_book.book_id, new_book.title
+            )
 
+        if is_valid_book:
+            insert_to_local_table(new_book, "books")
+            st.write(f"{new_book.title} added to books database")
+            st.dataframe(new_book.book_df)
+
+        if not add_to_reading_list:
             if not is_valid_book:
                 st.write(
                     "You can add this book to the reading list by submitting the form again, but make sure you select option to add to reading list"
                 )
 
         if add_to_reading_list:
-            is_valid_reading_list = validate_new_entry(
-                "reading_list", new_book.book_id, new_book.title
-            )
-
             if is_valid_reading_list:
                 book_to_read = ToRead(
                     new_book.title, new_book.author, new_book.category, suggested_by

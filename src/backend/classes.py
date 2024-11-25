@@ -1,6 +1,7 @@
 import datetime as dt
 import polars as pl
 import sys
+import duckdb
 
 sys.path.append("././")
 
@@ -61,7 +62,10 @@ class Book:
 
     @property
     def book_id(self):
-        return create_id("./data/books.csv")
+        if duckdb.sql(f"SELECT * FROM read_csv('./data/books.csv') WHERE title = '{self.title}' AND author = '{self.author}'").pl().is_empty():
+            return create_id("./data/books.csv")
+        else:
+            return duckdb.sql(f"SELECT MAX(book_id) FROM read_csv('./data/books.csv') WHERE title = '{self.title}' AND author = '{self.author}'").pl()[0, 0]
 
     @property
     def book_df(self):
