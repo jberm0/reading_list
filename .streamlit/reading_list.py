@@ -6,12 +6,12 @@ import polars as pl
 
 sys.path.append("././")
 
-from src.backend.classes import init_db, Finished
-from src.backend.db import delete_book, validate_new_entry, insert_to_local_table
+from src.classes import init_db, Finished
+from src.db import delete_book, validate_new_entry, insert_to_local_table
 
 init_db()
 
-st.write("# Reading List")
+st.title("Reading List")
 
 st.dataframe(
     duckdb.execute(

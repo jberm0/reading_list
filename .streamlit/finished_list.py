@@ -4,9 +4,9 @@ import sys
 
 sys.path.append("././")
 
-from src.backend.classes import FinishedList
+from src.classes import FinishedList
 
-st.write("# Finished")
+st.title("Finished Books")
 
 FinishedList()
 st.dataframe(

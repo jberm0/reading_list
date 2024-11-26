@@ -5,10 +5,10 @@ import duckdb
 
 sys.path.append("././")
 
-from src.backend.db import (
+from src.db import (
     create_or_replace_table,
 )
-from src.backend.utils import create_id
+from src.utils import create_id
 
 
 class Table:

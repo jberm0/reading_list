@@ -4,10 +4,10 @@ import duckdb
 
 sys.path.append("././")
 
-from src.backend.classes import Book, ToRead, ReadingList
-from src.backend.db import validate_new_entry, insert_to_local_table
+from src.classes import Book, ToRead, ReadingList
+from src.db import validate_new_entry, insert_to_local_table
 
-st.write("# Add a book to the reading list")
+st.title("Add a book to the Reading List")
 
 def create_book():
     with st.form("add book"):
