@@ -14,5 +14,5 @@ This app was created in _Python_ :snake: using:
 - _Polars_ :polar_bear:
 - _DuckDB_ :duck:
 
-To contribute or report an issue, please visit the repository: 
+To contribute or report an issue, please visit jberm0's repository [here](https://github.com/jberm0/reading_list/tree/main).
 """)
