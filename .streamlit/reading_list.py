@@ -7,7 +7,7 @@ import polars as pl
 sys.path.append("././")
 
 from src.classes import init_db, Finished
-from src.db import delete_book, validate_new_entry, insert_to_local_table
+from src.db import delete_book_obj, validate_new_entry, insert_to_local_table
 
 def reading_list():
 
@@ -73,7 +73,7 @@ def reading_list():
 
             if is_valid:
                 insert_to_local_table(finished_book, "finished")
-                delete_book(finished_book, "reading_list")
+                delete_book_obj(finished_book, "reading_list")
 
         else:
             st.write("No match found in reading list for that title and author, please check inputs")
