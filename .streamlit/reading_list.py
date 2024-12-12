@@ -7,77 +7,75 @@ import polars as pl
 sys.path.append("././")
 
 from src.classes import init_db, Finished
-from src.db import delete_book, validate_new_entry, insert_to_local_table
+from src.db import delete_book_obj, validate_new_entry, insert_to_local_table
 
-init_db()
+def reading_list():
 
-st.title("Reading List")
+    init_db()
 
-st.dataframe(
-    duckdb.execute(
-        """
-        SELECT list_id as id, title, author, suggested_by, added
-        FROM data.reading_list
-        """
-    ).pl()
-)
+    st.title("Reading List")
 
-st.sidebar.title("Finish Book")
-with st.sidebar.form("Finish Book"):
-    title = st.text_input("Title")
-    author = st.text_input("Author")
-    rating = st.number_input("Rating out of 10", min_value=0, max_value=10, step=1, value=None)
+    st.dataframe(
+        duckdb.execute(
+            """
+            SELECT list_id as id, title, author, suggested_by, added
+            FROM data.reading_list
+            """
+        ).pl()
+    )
 
-    submitted = st.form_submit_button("Submit")
+    st.sidebar.title("Finish Book")
+    with st.sidebar.form("Finish Book"):
+        title = st.text_input("Title")
+        author = st.text_input("Author")
+        rating = st.number_input("Rating out of 10", min_value=0, max_value=10, step=1, value=None)
 
-count_matches = duckdb.execute(
-    f"""
-        SELECT COUNT(*)
-        FROM data.reading_list
-        WHERE title = '{title}'
-        AND author = '{author}'
-        """
-).pl()[0, 0]
+        submitted = st.form_submit_button("Submit")
 
-if submitted:
-    if count_matches > 0:
-        st.write(
+    count_matches = duckdb.execute(
         f"""
-        Book found in the reading list \n
-        Adding to finished list
-        """)
+            SELECT COUNT(*)
+            FROM data.reading_list
+            WHERE title = '{title}'
+            AND author = '{author}'
+            """
+    ).pl()[0, 0]
 
-        category = duckdb.execute(
-                f"""
-                    SELECT category
-                    FROM data.books
-                    WHERE title = '{title}'
-                    AND author = '{author}'
-                    """
-            ).pl()[0, 0]
+    if submitted:
+        if count_matches > 0:
+            st.write(
+            f"""
+            Book found in the reading list \n
+            Adding to finished list
+            """)
 
-        suggested_by = duckdb.execute(
-                            f"""
-                                SELECT suggested_by
-                                FROM data.reading_list
-                                WHERE title = '{title}'
-                                AND author = '{author}'
-                                """
-                        ).pl()[0, 0]
+            category = duckdb.execute(
+                    f"""
+                        SELECT category
+                        FROM data.books
+                        WHERE title = '{title}'
+                        AND author = '{author}'
+                        """
+                ).pl()[0, 0]
 
-        finished_book = Finished(title, author, category, suggested_by, rating)
+            suggested_by = duckdb.execute(
+                                f"""
+                                    SELECT suggested_by
+                                    FROM data.reading_list
+                                    WHERE title = '{title}'
+                                    AND author = '{author}'
+                                    """
+                            ).pl()[0, 0]
 
-        is_valid = validate_new_entry("finished", finished_book.book_id, finished_book.title)
+            finished_book = Finished(title, author, category, suggested_by, rating)
 
-        if is_valid:
-            insert_to_local_table(finished_book, "finished")
-            delete_book(finished_book, "reading_list")
+            is_valid = validate_new_entry("finished", finished_book.book_id, finished_book.title)
 
-    else:
-        st.write("No match found in reading list for that title and author, please check inputs")
+            if is_valid:
+                insert_to_local_table(finished_book, "finished")
+                delete_book_obj(finished_book, "reading_list")
 
+        else:
+            st.write("No match found in reading list for that title and author, please check inputs")
 
-
-# TODO:
-# - add functionality to finish a book on reading list
-# - remove book from reading list
+reading_list()

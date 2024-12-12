@@ -99,9 +99,16 @@ def display_fp_table(schema, table, extension):
     )
 
 
-def delete_book(book, table):
+def delete_book_obj(book, table):
     query = f"DELETE FROM data.{table} WHERE book_id = {book.book_id}"
     duckdb.execute(query)
     print(f"Deleted from data.'{table}' where book_id is {book.book_id}")
     sync_table_to_local_file(schema="data", table=table, extension="csv")
+    print("Synced to local filesystem")
+
+def delete_finished_book(id, title, author):
+    query = f"DELETE FROM data.finished WHERE finished_id = '{id}' AND title = '{title}' AND author = '{author}'"
+    duckdb.execute(query)
+    print(f"Deleted from data.finished where finished_id is {id}, title is {title} and author is {author}")
+    sync_table_to_local_file(schema="data", table="finished", extension="csv")
     print("Synced to local filesystem")

@@ -10,7 +10,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
     menu_items={
         # 'Get Help': 'https://www.extremelycoolapp.com/help',
-        # 'Report a bug': "https://www.extremelycoolapp.com/bug",
+        'Report a bug': "https://github.com/jberm0/reading_list/tree/main",
         'About': "# This is a header. This is an *extremely* cool app!"
     }
     )

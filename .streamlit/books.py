@@ -7,9 +7,10 @@ sys.path.append("././")
 from src.classes import Book, ToRead, ReadingList
 from src.db import validate_new_entry, insert_to_local_table
 
-st.title("Add a book to the Reading List")
 
 def create_book():
+    st.title("Add a book to the Reading List")
+
     with st.form("add book"):
         title = st.text_input("Title")
         author = st.text_input("Author")
