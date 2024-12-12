@@ -75,9 +75,3 @@ if submitted:
 
     else:
         st.write("No match found in reading list for that title and author, please check inputs")
-
-
-
-# TODO:
-# - add functionality to finish a book on reading list
-# - remove book from reading list
