@@ -63,7 +63,7 @@ class Book:
     @property
     def book_id(self):
         if duckdb.sql(f"SELECT * FROM read_csv('./data/books.csv') WHERE title = '{self.title}' AND author = '{self.author}'").pl().is_empty():
-            return create_id("./data/books.csv")
+            return create_id("./data/books.csv", "book_id")
         else:
             return duckdb.sql(f"SELECT MAX(book_id) FROM read_csv('./data/books.csv') WHERE title = '{self.title}' AND author = '{self.author}'").pl()[0, 0]
 
@@ -92,7 +92,7 @@ class ToRead(Book):
         super().__init__(title, author, category)
         self.suggested_by = suggested_by
         self.added = dt.datetime.today()
-        self.list_id = create_id("./data/reading_list.csv")
+        self.list_id = create_id("./data/reading_list.csv", "list_id")
 
     @property
     def book_id(self):
@@ -123,7 +123,7 @@ class Finished(ToRead):
     def __init__(self, title, author, category, suggested_by, rating):
         super().__init__(title, author, category, suggested_by)
         self.finished = dt.datetime.today()
-        self.finished_id = create_id("./data/finished.csv")
+        self.finished_id = create_id("./data/finished.csv", "finished_id")
         self.rating = rating
 
         # delete_book(self, "reading_list")
