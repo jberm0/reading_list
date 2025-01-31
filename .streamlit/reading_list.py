@@ -18,7 +18,7 @@ def reading_list():
     st.dataframe(
         duckdb.execute(
             """
-            SELECT list_id as id, title, author, suggested_by, added
+            SELECT title, author, suggested_by, added
             FROM data.reading_list
             """
         ).pl()
